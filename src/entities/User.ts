@@ -23,6 +23,7 @@ export class User {
 
     @OneToOne(type => Address, address => address.userId, { nullable: false })
     address: Address;
+    updatedUser: { zipcode: string; address: string; number: string; };
 
 
 }
