@@ -1,40 +1,38 @@
-import { Address } from './../entities/Address';
-
+import { CRUDUserService } from '../services/CRUDUserService';
 import { Request, Response } from 'express';
-import { CreateUserService, UpdateUserAddressService, UpdateUserService } from '../services/CRUDUserService';
 
 
 
-export class CreateUserController {
 
-    async handle(request: Request, response: Response) {
+export class CRUDUserController {
+
+    async create(request: Request, response: Response) {
         const { name, phone, email, password, address } = request.body;
 
-        const service = new CreateUserService();
+        const service = new CRUDUserService();
 
-        const result = await service.execute({ name, phone, email, password, address });
+        const result = await service.create({ name, phone, email, password, address });
 
         if (result instanceof Error) {
             return response.status(400).json({ error: result.message });
         }
+        const { password: pass, ...user } = result;
 
-        return response.status(201).json(result);
+        return response.status(201).json(user);
 
     }
 
 
 
-}
 
-export class UpdateUserController {
 
-    async handle(request: Request, response: Response) {
+    async update(request: Request, response: Response) {
         const { id } = request.params;
         const { name, phone, email, password } = request.body;
 
-        const service = new UpdateUserService();
+        const service = new CRUDUserService();
 
-        const result = await service.execute({ id: parseInt(id), name, phone, email, password });
+        const result = await service.update({ id: parseInt(id), name, phone, email, password });
 
         if (result instanceof Error) {
             return response.status(400).json({ error: result.message });
@@ -43,18 +41,18 @@ export class UpdateUserController {
         return response.json(result);
     }
 
-}
 
 
-export class UpdateUserAddressController {
 
-    async handle(request: Request, response: Response) {
+
+
+    async updateAddress(request: Request, response: Response) {
         const { userId } = request.params;
         const address = request.body;
 
-        const service = new UpdateUserAddressService();
+        const service = new CRUDUserService();
 
-        const result = await service.execute(parseInt(userId), address);
+        const result = await service.updateAddress(parseInt(userId), address);
 
         if (result instanceof Error) {
             return response.status(400).json({ error: result.message });

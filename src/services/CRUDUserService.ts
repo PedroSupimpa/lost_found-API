@@ -2,6 +2,7 @@ import { Address } from './../entities/Address';
 import { User } from "../entities/User";
 import { addressRepository } from "../repository/addressRepository";
 import { userRepository } from "../repository/userRepository";
+import bcrypt from "bcrypt";
 
 interface IUserRequest {
     name: string;
@@ -15,15 +16,20 @@ interface IUserRequest {
     };
 }
 
-export class CreateUserService {
-    async execute({ name, phone, email, password, address }: IUserRequest): Promise<User | Error> {
+
+
+export class CRUDUserService {
+    async create({ name, phone, email, password, address }: IUserRequest): Promise<User | Error> {
+
+        const hashPassword = await bcrypt.hash(password, 10);
+
 
 
         const newUser = userRepository.create({
             name,
             phone,
             email,
-            password,
+            password: hashPassword,
         })
 
         await userRepository.save(newUser)
@@ -35,27 +41,20 @@ export class CreateUserService {
             number: address.number,
         });
 
-        await addressRepository.save(newAddress);
 
 
         newUser.address = newAddress;
+        await addressRepository.save(newAddress);
+
+
+
+
 
         return newUser;
-
     }
 
-}
 
-interface IUpdateUserService {
-    id: number;
-    name: string;
-    phone: string;
-    email: string;
-    password: string;
-}
-
-export class UpdateUserService {
-    async execute({ id, name, phone, email, password, }: IUpdateUserService) {
+    async update({ id, name, phone, email, password }: Omit<User, "address" | "updatedUser">) {
 
         const updatedUser = await userRepository.findOne({ where: { id } });
 
@@ -74,12 +73,12 @@ export class UpdateUserService {
 
         return updatedUser;
     }
-}
 
 
 
-export class UpdateUserAddressService {
-    async execute(userId: number, address: Address) {
+
+
+    async updateAddress(userId: number, address: Address) {
 
         const updatedAddress = await addressRepository.findOne({ where: { userId } });
 
@@ -97,3 +96,4 @@ export class UpdateUserAddressService {
         return updatedAddress;
     }
 }
+
