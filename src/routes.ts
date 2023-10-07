@@ -1,11 +1,14 @@
 import { Router } from 'express'
-import { CreateUserController, UpdateUserAddressController, UpdateUserController } from './controllers/CRUDUserController'
+import { CRUDUserController } from './controllers/CRUDUserController'
+import { LoginController } from './controllers/LoginController'
 
 const routes = Router()
 
-routes.post('/user', new CreateUserController().handle)
-routes.put('/user/:id', new UpdateUserController().handle)
-routes.put('/user/address/:userId', new UpdateUserAddressController().handle)
+routes.post('/user', new CRUDUserController().create)
+routes.put('/user/:id', new CRUDUserController().update)
+routes.put('/user/address/:userId', new CRUDUserController().updateAddress)
+routes.post('/user/login', new LoginController().login)
+routes.get('/user/authentication', new LoginController().getAuthenticatedUser)
 
 
 export default routes
