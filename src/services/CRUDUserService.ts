@@ -74,7 +74,33 @@ export class CRUDUserService {
         return updatedUser;
     }
 
+    async updatePassword(id: number, updatePassword: { oldPassword: string, newPassword: string }) {
 
+        const updatedUserPassword = await userRepository.findOne({ where: { id } });
+
+        if (!updatedUserPassword) {
+            return new Error("User not found");
+        }
+
+        if (!(await bcrypt.compare(updatePassword.oldPassword, updatedUserPassword.password))) {
+
+            return new Error("Incorrect old password");
+
+        }
+        if (updatePassword.oldPassword === updatePassword.newPassword) {
+            return new Error("The new password cannot be the same as the old password");
+        }
+
+        const newPasswordHash = await bcrypt.hash(updatePassword.newPassword, 10);
+
+        updatedUserPassword.password = newPasswordHash;
+
+
+
+        await userRepository.save(updatedUserPassword);
+        return updatedUserPassword;
+
+    }
 
 
 

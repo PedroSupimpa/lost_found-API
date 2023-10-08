@@ -41,7 +41,25 @@ export class CRUDUserController {
         return response.json(result);
     }
 
+    async updatePassword(request: Request, response: Response) {
 
+        const { id } = request.params;
+        const updatePassword = request.body;
+
+
+        const service = new CRUDUserService();
+
+        const result = await service.updatePassword(parseInt(id), updatePassword);
+
+        if (result instanceof Error) {
+            return response.status(400).json({ error: result.message });
+        }
+
+
+
+        return response.json("Password updated successfully");
+
+    }
 
 
 
