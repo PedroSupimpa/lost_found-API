@@ -19,24 +19,11 @@ export class LoginController {
         }
 
 
-
-
         return response.status(200).json(result);
     }
 
     async getAuthenticatedUser(request: Request, response: Response) {
 
-        const { authorization } = request.headers;
-
-        const service = new LoginService();
-
-        const result = await service.getAuthenticatedUser(authorization ?? '');
-
-
-        if (result instanceof Error) {
-            return response.status(400).json({ error: result.message });
-        }
-
-        return response.status(200).json(result);
+        return response.status(200).json(request.user);
     }
 }
