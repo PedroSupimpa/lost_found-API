@@ -4,7 +4,7 @@ import { User } from "./User";
 import { PostCategory } from "./PostCategory";
 import { Point } from "geojson"
 import { PostImage } from "./PostImage";
-@Entity('posts')
+@Entity('post')
 export class Post {
 
     @PrimaryGeneratedColumn()
@@ -22,7 +22,7 @@ export class Post {
     @Column({ nullable: false })
     createdDate: Date;
 
-    @Column({ nullable: false })
+    @Column()
     closedDate: Date;
 
     @ManyToOne(type => User, user => user.id, { nullable: false })
