@@ -13,7 +13,10 @@ routes.post('/user/login', new LoginController().login)
 routes.get('/user/authentication', authMiddleware, new LoginController().getAuthenticatedUser)
 routes.put('/user/password/:id', new CRUDUserController().updatePassword)
 routes.post('/user/createPost/:userId', new PostController().create)
-routes.post('/user/uploadPostImages/:userId/:postId', new PostController().uploadPostImages)
+routes.post('/user/uploadPostImages/:postId', new PostController().uploadPostImages)
+routes.get('/user/postImages/:postId', new PostController().postImages)
+routes.get('/user/getPosts/:postId', new PostController().getPosts)
+routes.delete('/user/deletePost/:postId', new PostController().deletePost)
 
 
 export default routes
