@@ -27,11 +27,15 @@ export class PostController {
         const imageLink = uuidv4();
         const postService = new PostService();
 
-        const postImagesUpload = postService.uploadPostImages(request, response, parseInt(postId), imageLink);
-
-        return response.json(postImagesUpload);
-
+        postService.uploadPostImages(request, response, parseInt(postId), imageLink)
+            .then((result) => {
+                return response.json(result);
+            })
+            .catch((error) => {
+                return response.status(400).json({ message: error.message });
+            });
     }
+
 
 
     async postImages(request: Request, response: Response) {
@@ -61,6 +65,7 @@ export class PostController {
 
         const postService = new PostService();
         const posts = await postService.deletePost(parseInt(postId));
+
 
         return response.json(posts);
     }
