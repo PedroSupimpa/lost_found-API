@@ -66,7 +66,6 @@ export class PostController {
         const postService = new PostService();
         const posts = await postService.deletePost(parseInt(postId));
 
-
         return response.json(posts);
     }
 }

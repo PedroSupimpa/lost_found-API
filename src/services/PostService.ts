@@ -56,21 +56,15 @@ export class PostService {
         if (!post) throw new Error("Post not found");
 
         try {
-            await new Promise((resolve, reject) => {
-                imageUploadMiddleware(request, response, imageLink, function (error: any) {
-                    if (error) {
-                        reject(error);
-                    }
-
-                    const newPostImage = postImageRepository.create({
-                        imageLink,
-                        postId: post.id
-                    });
-
-                    postImageRepository.save(newPostImage);
-                    resolve({ message: "Images uploaded successfully" });
+            imageUploadMiddleware(request, response, imageLink, function (error: any) {
+                const newPostImage = postImageRepository.create({
+                    imageLink,
+                    postId: post.id
                 });
+
+                postImageRepository.save(newPostImage);
             });
+
 
             return { message: "Images uploaded successfully" };
         } catch (error) {
