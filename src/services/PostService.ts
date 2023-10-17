@@ -7,6 +7,7 @@ import { postCategoryRepository } from "../repository/postCategory";
 import { postImageRepository } from "../repository/postImageRepository";
 import { imageUploadMiddleware } from "../middleware/imageUploadMiddleware";
 import { Request, Response, request, response } from "express";
+import fs from "fs";
 
 
 
@@ -50,28 +51,27 @@ export class PostService {
     }
 
 
-
     async uploadPostImages(request: Request, response: Response, postId: number, imageLink: string) {
-
         const post = await postRepository.findOne({ where: { id: postId } });
         if (!post) throw new Error("Post not found");
 
-        imageUploadMiddleware(request, response, imageLink, function (error: any) {
-            if (error) {
-                return response.status(400).json({ message: error.message });
-            }
+        try {
+            imageUploadMiddleware(request, response, imageLink, function (error: any) {
+                const newPostImage = postImageRepository.create({
+                    imageLink,
+                    postId: post.id
+                });
 
-            const newPostImage = postImageRepository.create({
-                imageLink,
-                postId: post.id
+                postImageRepository.save(newPostImage);
             });
 
-            postImageRepository.save(newPostImage);
 
-            return response.status(201).json({ message: "Image uploaded successfully" });
-        });
-
+            return { message: "Images uploaded successfully" };
+        } catch (error) {
+            throw error;
+        }
     }
+
 
     async postImages(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });
@@ -103,18 +103,27 @@ export class PostService {
     }
 
     async deletePost(postId: number) {
-
         const post = await postRepository.findOne({ where: { id: postId } });
         const postImages = await postImageRepository.find({ where: { postId: postId } });
 
-        if (!post) throw new Error("Post not found");
-
-        await postImageRepository.delete({ postId: postId });
-
-        if (postImages.length > 0) {
-            await postRepository.delete({ id: postId });
+        if (!post) {
+            throw new Error("Post not found");
         }
-        return { message: "Post deleted successfully" };
+        try {
+
+            await postImages.forEach(postImage => {
+                const imageFilePath = `src/images/${postImage?.imageLink}.jpg`;
+                fs.unlinkSync(imageFilePath);
+            });
+            await postImageRepository.remove(postImages);
+            await postRepository.remove(post);
+        } catch (error) {
+
+            throw error;
+        }
+
+        return { message: "Post and associated postImages deleted successfully" };
     }
+
 
 }
