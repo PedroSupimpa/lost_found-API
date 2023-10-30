@@ -27,7 +27,11 @@ export class PostController {
         const imageLink = uuidv4();
         const postService = new PostService();
 
-        postService.uploadPostImages(request, response, parseInt(postId), imageLink)
+        await postService.uploadPostImages(request, response, parseInt(postId), imageLink)
+
+        response.json({ message: "Images uploaded successfully" })
+
+
 
     }
 

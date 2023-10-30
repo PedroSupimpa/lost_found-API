@@ -5,8 +5,8 @@ import { userRepository } from "../repository/userRepository";
 import { PostCategory } from "../entities/PostCategory";
 import { postCategoryRepository } from "../repository/postCategory";
 import { postImageRepository } from "../repository/postImageRepository";
-import { imageUploadMiddleware } from "../middleware/imageUploadMiddleware";
-import { Request, Response, request, response } from "express";
+import { imageUpload } from "../utils/imageUpload";
+import { Request, Response } from "express";
 import fs from "fs";
 
 
@@ -56,17 +56,13 @@ export class PostService {
         if (!post) throw new Error("Post not found");
 
         try {
-            imageUploadMiddleware(request, response, imageLink, function (error: any) {
-                const newPostImage = postImageRepository.create({
-                    imageLink,
-                    postId: post.id
-                });
-
-                postImageRepository.save(newPostImage);
-                response.json({ message: "Images uploaded successfully" })
+            await imageUpload(request, response, imageLink)
+            const newPostImage = postImageRepository.create({
+                imageLink,
+                postId: post.id
             });
 
-
+            postImageRepository.save(newPostImage);
 
         } catch (error) {
             throw error;
