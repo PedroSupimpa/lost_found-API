@@ -27,10 +27,9 @@ export const imageUploadMiddleware = async (request: Request, response: Response
             return response.status(400).json({ message: error.message });
         }
 
-        return response.json({ message: 'Image uploaded successfully' });
+        next();
     });
 
 
-    next();
 
 }

@@ -28,15 +28,8 @@ export class PostController {
         const postService = new PostService();
 
         postService.uploadPostImages(request, response, parseInt(postId), imageLink)
-            .then((result) => {
-                return response.json(result);
-            })
-            .catch((error) => {
-                return response.status(400).json({ message: error.message });
-            });
+
     }
-
-
 
     async postImages(request: Request, response: Response) {
 

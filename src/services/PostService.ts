@@ -63,10 +63,11 @@ export class PostService {
                 });
 
                 postImageRepository.save(newPostImage);
+                response.json({ message: "Images uploaded successfully" })
             });
 
 
-            return { message: "Images uploaded successfully" };
+
         } catch (error) {
             throw error;
         }
