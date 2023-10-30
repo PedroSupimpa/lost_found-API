@@ -15,13 +15,13 @@ export class LoginService {
         const user = await userRepository.findOne({ where: { email } });
 
         if (!user) {
-            return new Error("User not found");
+            throw new Error("User not found");
         }
 
         const verifyPassword = await bcrypt.compare(password, user.password);
 
         if (!verifyPassword) {
-            return new Error("Incorrect password");
+            throw new Error("Incorrect password");
         }
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_PASS ?? '', { expiresIn: '8h' });
