@@ -8,6 +8,8 @@ import { postImageRepository } from "../repository/postImageRepository";
 import { imageUpload } from "../utils/imageUpload";
 import { Request, Response } from "express";
 import fs from "fs";
+import { ILike } from "typeorm";
+
 
 
 
@@ -22,6 +24,16 @@ interface IPostRequest {
     images?: string[];
 }
 
+export interface IGetPostsParams {
+    longitude: string;
+    latitude: string;
+    locationRange: string;
+    category: string;
+    text: string;
+    page: string;
+    postQty: string;
+    sortPost: string;
+}
 
 export class PostService {
 
@@ -69,7 +81,6 @@ export class PostService {
         }
     }
 
-
     async postImages(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });
         if (!post) throw new Error("Post not found");
@@ -83,21 +94,72 @@ export class PostService {
         return postImages;
     }
 
-    async getPosts(postId: number) {
 
-        const posts = await postRepository.find({ where: { id: postId } });
-        const postImages = await postImageRepository.find({ where: { postId: postId } });
+    async getPosts(params: IGetPostsParams) {
+        try {
+            const query: any = {};
 
-        posts.forEach(post => {
-            postImages.forEach(postImage => {
-                postImage.imageLink = `http://localhost:3000/user/images/${postImage.imageLink}.jpg`;
-            });
-            post.images = postImages
-        });
+            if (params.category) {
+                query.category = { id: parseInt(params.category) };
+            }
 
-        return posts;
+            if (params.text) {
+                query.title = ILike(`%${params.text}%`);
+            }
 
+            const page = params.page ? parseInt(params.page.toString(), 10) : 1;
+            const postQty = params.postQty ? parseInt(params.postQty.toString(), 10) : 10;
+            const sortPost = params.sortPost ? params.sortPost : 'createdDate';
+
+            let posts;
+            let totalPosts;
+
+
+            if (params.latitude && params.longitude && params.locationRange) {
+
+                const locationQuery = `circle(point(:longitude, :latitude), :radius) @> location`;
+
+                posts = await postRepository.createQueryBuilder("post")
+                    .where(query)
+                    .andWhere(locationQuery, {
+                        longitude: params.longitude,
+                        latitude: params.latitude,
+                        radius: params.locationRange
+                    })
+                    .skip((page - 1) * postQty)
+                    .take(postQty)
+                    .orderBy(`post.${sortPost}`, 'DESC')
+                    .getMany();
+
+                totalPosts = await postRepository.createQueryBuilder("post")
+                    .where(query)
+                    .andWhere(locationQuery, {
+                        longitude: params.longitude,
+                        latitude: params.latitude,
+                        radius: params.locationRange
+                    })
+                    .getCount();
+            } else {
+                posts = await postRepository.find({
+                    where: query,
+                    skip: (page - 1) * postQty,
+                    take: postQty,
+                    order: { [sortPost]: 'DESC' }
+                });
+
+                totalPosts = await postRepository.count({ where: query });
+            }
+
+            const totalPages = Math.ceil(totalPosts / postQty);
+            console.log(`Page: ${page}, Post Quantity: ${postQty}, Sort Post: ${sortPost}`);
+
+            return { posts, totalPages };
+        } catch (error) {
+            throw error;
+        }
     }
+
+
 
     async deletePost(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });
@@ -107,7 +169,6 @@ export class PostService {
             throw new Error("Post not found");
         }
         try {
-
             await postImages.forEach(postImage => {
                 const imageFilePath = `src/images/${postImage?.imageLink}.jpg`;
                 fs.unlinkSync(imageFilePath);
@@ -118,9 +179,6 @@ export class PostService {
 
             throw error;
         }
-
         return { message: "Post and associated postImages deleted successfully" };
     }
-
-
 }
