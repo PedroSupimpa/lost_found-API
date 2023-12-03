@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
-import { PostService } from "../services/PostService";
+import { IGetPostsParams, PostService } from "../services/PostService";
+
+
 
 
 
@@ -27,16 +29,11 @@ export class PostController {
         const imageLink = uuidv4();
         const postService = new PostService();
 
-        postService.uploadPostImages(request, response, parseInt(postId), imageLink)
-            .then((result) => {
-                return response.json(result);
-            })
-            .catch((error) => {
-                return response.status(400).json({ message: error.message });
-            });
+        await postService.uploadPostImages(request, response, parseInt(postId), imageLink)
+
+        response.json({ message: "Images uploaded successfully" })
+
     }
-
-
 
     async postImages(request: Request, response: Response) {
 
@@ -50,14 +47,23 @@ export class PostController {
     }
 
     async getPosts(request: Request, response: Response) {
-        const { postId } = request.params;
+
+        const params: IGetPostsParams = {
+            longitude: request.query.longitude as string || "",
+            latitude: request.query.latitude as string || "",
+            locationRange: request.query.locationRange as string || "",
+            category: request.query.category as string || "",
+            text: request.query.text as string || "",
+            page: request.query.page as string || "1",
+            postQty: request.query.postQty as string || "10",
+            sortPost: request.query.sortPost as string || "createdDate"
+        }
 
         const postService = new PostService();
-        const posts = await postService.getPosts(parseInt(postId));
+
+        const posts = await postService.getPosts(params);
 
         return response.json(posts);
-
-
     }
 
     async deletePost(request: Request, response: Response) {

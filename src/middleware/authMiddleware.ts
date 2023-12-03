@@ -6,7 +6,7 @@ export const authMiddleware = async (request: Request, response: Response, next:
 
     const { authorization } = request.headers;
     if (!authorization) {
-        return new Error("Not authorized");
+        throw new Error("Not authorized");
     }
 
     const token = authorization.split(' ')[1];
@@ -16,7 +16,7 @@ export const authMiddleware = async (request: Request, response: Response, next:
     const user = await userRepository.findOne({ where: { id } });
 
     if (!user) {
-        return new Error("Not authorized");
+        throw new Error("Not authorized - User not found");
     }
 
     const { password: pass, ...loggedUser } = user;
