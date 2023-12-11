@@ -17,7 +17,7 @@ routes.put('/user/password/:id', new CRUDUserController().updatePassword)
 routes.post('/user/createPost/:userId', new PostController().create)
 routes.post('/user/uploadPostImages/:postId', new PostController().uploadPostImages)
 routes.get('/user/postImages/:postId', new PostController().postImages)
-routes.get('/user/getPosts/:postId', new PostController().getPosts)
+routes.get('/user/getPosts', new PostController().getPosts)
 routes.delete('/user/deletePost/:postId', new PostController().deletePost)
 
 
