@@ -3,6 +3,17 @@ import { User } from "../entities/User";
 import { addressRepository } from "../repository/addressRepository";
 import { userRepository } from "../repository/userRepository";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+        user: "email",
+        pass: "password",
+    },
+
+})
 
 interface IUserRequest {
     name: string;
@@ -51,6 +62,20 @@ export class CRUDUserService {
 
 
         return newUser;
+    }
+
+    async emailConfirmation(to: string, subject: string, text: string) {
+        transporter.sendMail({
+            from: to,
+            to: "pedrosupimpa@gmail.com",
+            subject: subject,
+            text: text,
+        })
+
+        if (to === "") {
+            return new Error("Email not found");
+        }
+
     }
 
 
