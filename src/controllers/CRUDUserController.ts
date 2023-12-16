@@ -23,6 +23,22 @@ export class CRUDUserController {
     }
 
 
+    async emailConfirmation(request: Request, response: Response) {
+
+        const { email, subject, text } = request.body;
+
+        const service = new CRUDUserService();
+
+        const result = await service.emailConfirmation(email, subject, text);
+
+        if (result instanceof Error) {
+            return response.status(400).json({ error: result.message });
+        }
+
+
+        return response.status(201).json("Email sent successfully");
+
+    }
 
 
 
@@ -54,8 +70,6 @@ export class CRUDUserController {
         if (result instanceof Error) {
             return response.status(400).json({ error: result.message });
         }
-
-
 
         return response.json("Password updated successfully");
 
