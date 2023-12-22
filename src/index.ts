@@ -3,11 +3,13 @@ import AppDataSource from './data-source';
 import routes from './routes';
 import path from 'path';
 import fs from 'fs';
+const cors = require('cors')
 require('dotenv').config();
 
 
 AppDataSource.initialize().then(() => {
     const app = express();
+    app.use(cors())
 
     app.use(express.json());
 
