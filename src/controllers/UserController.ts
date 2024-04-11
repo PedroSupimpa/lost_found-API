@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 
 
-export class CRUDUserController {
+export class UserController {
 
     async create(request: Request, response: Response) {
         const { name, phone, email, password, address } = request.body;
