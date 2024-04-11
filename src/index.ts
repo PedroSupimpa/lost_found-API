@@ -5,6 +5,8 @@ import path from 'path';
 import fs from 'fs';
 const cors = require('cors')
 require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 
 AppDataSource.initialize().then(() => {
@@ -14,6 +16,7 @@ AppDataSource.initialize().then(() => {
     app.use(express.json());
 
     app.use(routes)
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.get('/user/images/:imageFileName', (req, res) => {
         const imageFileName = req.params.imageFileName;

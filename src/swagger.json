@@ -1,0 +1,420 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Lost and Found API",
+      "description": "API for managing users and posts in a Lost and Found application.",
+      "version": "1.0.0",
+      "contact": {
+        "email": "pedrosupimpa@sempreceub.com"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Development Server"
+      }
+    ],
+    "paths": {
+      "/user/create": {
+        "post": {
+          "summary": "Create a new user",
+          "tags": ["User"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "User successfully created."
+            },
+            "400": {
+              "description": "Invalid request data."
+            }
+          }
+        }
+      },
+      "/user/login": {
+        "post": {
+          "summary": "User login",
+          "tags": ["User"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogin"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login successful."
+            },
+            "400": {
+              "description": "Login failed."
+            }
+          }
+        }
+      },
+      "/user/authentication": {
+        "get": {
+          "summary": "Get authenticated user",
+          "tags": ["User"],
+          "responses": {
+            "200": {
+              "description": "Authenticated user information."
+            }
+          }
+        }
+      },
+      "/user/:id": {
+        "put": {
+          "summary": "Update user information",
+          "tags": ["User"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "User ID"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUpdate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "User information updated successfully."
+            },
+            "400": {
+              "description": "Invalid request data."
+            }
+          }
+        }
+      },
+      "/user/createPost/:userId": {
+        "post": {
+          "summary": "Create a new post",
+          "tags": ["Post"],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the user creating the post"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCreate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Post created successfully."
+            },
+            "400": {
+              "description": "Invalid request data."
+            }
+          }
+        }
+      },
+      "/user/uploadPostImages/:postId": {
+        "post": {
+          "summary": "Upload images for a post",
+          "tags": ["Post"],
+          "parameters": [
+            {
+              "name": "postId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the post to upload images for"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Images uploaded successfully."
+            },
+            "400": {
+              "description": "Failed to upload images."
+            }
+          }
+        }
+      },
+      "/user/postImages/:postId": {
+        "get": {
+          "summary": "Get images for a post",
+          "tags": ["Post"],
+          "parameters": [
+            {
+              "name": "postId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the post to retrieve images for"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved images."
+            },
+            "404": {
+              "description": "Post not found."
+            }
+          }
+        }
+      },
+      "/user/getPosts": {
+        "get": {
+          "summary": "Get list of posts",
+          "tags": ["Post"],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved list of posts."
+            }
+          }
+        }
+      },
+      "/user/deletePost/:postId": {
+        "delete": {
+          "summary": "Delete a post",
+          "tags": ["Post"],
+          "parameters": [
+            {
+              "name": "postId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the post to delete"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Post deleted successfully."
+            },
+            "404": {
+              "description": "Post not found."
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "UserCreate": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+                "example": "John Doe"
+            },
+            "phone": {
+              "type": "string",
+                "example": "123-456-7890"
+            },
+            "email": {
+              "type": "string",
+              "example":"johnDoe@mail.com"
+            },
+            "password": {
+              "type": "string",
+                "example": "654321"
+            },
+            "address": {
+              "type": "object",
+              "properties": {
+                "zip": {
+                  "type": "string",
+                    "example": "12345"
+                },
+                "address": {
+                  "type": "string",
+                    "example": "123 Main St."
+                },
+                "number": {
+                  "type": "string",
+                    "example": "12"
+                },
+                "observation": {
+                  "type": "string",
+                    "example": "Apartment 3A"
+                }
+              }
+            }
+          },
+          "required": ["name", "email", "password"]
+        },
+        "UserLogin": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+                "example": "johnDoe@mail.com"
+            },
+            "password": {
+              "type": "string",
+                "example": "654321"
+            }
+          },
+          "required": ["email", "password"]
+        },
+        "UserUpdate": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+                "example": "John Doe"
+            },
+            "phone": {
+              "type": "string",
+                "example": "123-456-7890"
+            },
+            "email": {
+              "type": "string",
+                "example": "johnDoe@mail.com"
+            },
+            "password": {
+              "type": "string",
+                "example": "654321"
+            }
+          }
+        },
+        "PostCreate": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "Lost Wallet"
+              },
+              "description": {
+                "type": "string",
+                "example": "Black leather wallet lost near Central Park."
+              },
+              "category": {
+                "type": "string",
+                "example": "Personal Items"
+              },
+              "location": {
+                "type": "string",
+                "example": "Central Park, New York, NY"
+              }
+            },
+            "required": ["title", "description", "category", "location"]
+          },
+          "UploadPostImages": {
+            "type": "object",
+            "properties": {
+              "imageLinks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://example.com/uploads/image1.jpg"
+                }
+              }
+            },
+            "required": ["imageLinks"]
+          },
+          "PostImagesResponse": {
+            "type": "object",
+            "properties": {
+              "images": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://example.com/uploads/image1.jpg"
+                }
+              }
+            }
+          },
+          "GetPostsResponse": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Lost Wallet"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Black leather wallet with several credit cards inside."
+                },
+                "category": {
+                  "type": "string",
+                  "example": "Personal Items"
+                },
+                "location": {
+                  "type": "string",
+                  "example": "Central Park, New York, NY"
+                },
+                "createdDate": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-03-15T14:00:00Z"
+                },
+                "createdByUser": {
+                  "type": "integer",
+                  "example": 123
+                },
+                "images": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uri",
+                    "example": "http://example.com/uploads/image2.jpg"
+                  }
+                }
+              }
+            }
+          },
+          "DeletePostResponse": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Post deleted successfully."
+              }
+            }
+          }
+      }
+    }
+  }
+  
