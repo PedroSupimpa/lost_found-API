@@ -9,7 +9,7 @@ const routes = Router()
 routes.post('/user', new UserController().create)
 routes.post('/user/login', new LoginController().login)
 
-routes.use(authMiddleware)
+//routes.use(authMiddleware)
 routes.get('/user/authentication', new LoginController().getAuthenticatedUser)
 routes.put('/user/:id', new UserController().update)
 routes.put('/user/address/:userId', new UserController().updateAddress)
