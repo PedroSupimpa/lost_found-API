@@ -6,7 +6,7 @@ import { PostController } from './controllers/PostController'
 
 const routes = Router()
 
-routes.post('/user', new UserController().create)
+routes.post('/user/create', new UserController().create)
 routes.post('/user/login', new LoginController().login)
 
 //routes.use(authMiddleware)
