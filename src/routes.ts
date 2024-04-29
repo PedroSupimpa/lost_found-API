@@ -8,9 +8,7 @@ const routes = Router()
 
 routes.post('/user/create', new UserController().create)
 routes.post('/user/login', new LoginController().login)
-
-//routes.use(authMiddleware)
-routes.get('/user/authentication', new LoginController().getAuthenticatedUser)
+routes.get('/user/authentication', authMiddleware, new LoginController().getAuthenticatedUser)
 routes.put('/user/:id', new UserController().update)
 routes.put('/user/address/:userId', new UserController().updateAddress)
 routes.put('/user/password/:id', new UserController().updatePassword)
