@@ -5,11 +5,13 @@ import path from 'path';
 import fs from 'fs';
 const cors = require('cors')
 require('dotenv').config();
+import cookieParser from 'cookie-parser';
 
 
 AppDataSource.initialize().then(() => {
     const app = express();
     app.use(cors())
+    app.use(cookieParser());
 
     app.use(express.json());
 
@@ -26,6 +28,14 @@ AppDataSource.initialize().then(() => {
             res.status(404).send('Imagem não encontrada');
         }
     });
+
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+        console.error(err.stack);
+        res.status(500).send('Something broke!');
+    });
+    
+
+
     return app.listen(process.env.PORT)
 
 })
