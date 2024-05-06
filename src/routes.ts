@@ -17,6 +17,8 @@ routes.post('/user/uploadPostImages/:postId',authMiddleware, new PostController(
 routes.get('/user/postImages/:postId', new PostController().postImages)
 routes.get('/user/getPosts', new PostController().getPosts)
 routes.delete('/user/deletePost/:postId',authMiddleware, new PostController().deletePost)
+routes.post('/new-category', new PostController().createPostCategory)
+routes.get('/get-categories', new PostController().getPostCategories)
 
 
 export default routes

@@ -74,4 +74,22 @@ export class PostController {
 
         return response.json(posts);
     }
+
+
+    async createPostCategory(request: Request, response: Response) {
+        const  categoryName  = request.body.category;
+        console.log(categoryName);
+        
+        const postService = new PostService();
+        const category = await postService.createCategory(categoryName);
+
+        return response.json(category);
+    }
+
+    async getPostCategories(request: Request, response: Response) {
+        const postService = new PostService();
+        const categories = await postService.getCategories();
+
+        return response.json(categories);
+    }
 }

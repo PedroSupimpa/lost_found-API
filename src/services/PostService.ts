@@ -181,4 +181,28 @@ export class PostService {
         }
         return { message: "Post and associated postImages deleted successfully" };
     }
+
+    async createCategory(name: string) {
+
+        if (!name) return new Error("Category name is required");
+
+        if (await postCategoryRepository.findOne({ where: { name } })) {
+            return new Error("Category already exists");
+        }
+
+        const category = postCategoryRepository.create({
+            name
+        });
+
+        await postCategoryRepository.save(category);
+
+        return category;
+    }
+
+    async getCategories() {
+        const categories = await postCategoryRepository.find();
+        return categories;
+    }
+
+
 }
