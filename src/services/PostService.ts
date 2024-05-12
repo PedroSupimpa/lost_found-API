@@ -21,7 +21,11 @@ interface IPostRequest {
     createdDate: Date;
     closedDate?: Date;
     createdByUser: number;
-    images?: string[];
+    images?: {
+        imageLink: string;
+        postId: number;
+    }[];
+    
 }
 
 export interface IGetPostsParams {
@@ -139,6 +143,7 @@ export class PostService {
                         radius: params.locationRange
                     })
                     .getCount();
+                    
             } else {
                 posts = await postRepository.find({
                     where: query,
@@ -151,7 +156,15 @@ export class PostService {
             }
 
             const totalPages = Math.ceil(totalPosts / postQty);
-            console.log(`Page: ${page}, Post Quantity: ${postQty}, Sort Post: ${sortPost}`);
+            
+            await Promise.all(posts.map(async post => {
+                const postImages = await postImageRepository.find({ where: { postId: post.id } });
+                post.images = postImages.map(postImage => ({
+                    imageLink: `http://localhost:3000/user/images/${postImage.imageLink}.jpg`,
+                    postId: post.id 
+                }));
+                return post;
+            }));
 
             return { posts, totalPages };
         } catch (error) {
