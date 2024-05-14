@@ -40,6 +40,9 @@ export interface IGetPostsParams {
     sortPost: string;
 }
 
+
+//const url = "localhost:3000";
+const url= "lost-found-api-d361.onrender.com";
 export class PostService {
 
     async create({ title, description, category, location, createdDate, createdByUser }: IPostRequest) {
@@ -93,7 +96,7 @@ export class PostService {
         const postImages = await postImageRepository.find({ where: { postId: postId } });
 
         postImages.forEach(postImage => {
-            postImage.imageLink = `http://localhost:3000/user/images/${postImage.imageLink}.jpg`;
+            postImage.imageLink = `http://${url}/user/images/${postImage.imageLink}.jpg`;
         });
 
         return postImages;
