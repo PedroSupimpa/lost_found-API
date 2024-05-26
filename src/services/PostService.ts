@@ -71,12 +71,12 @@ export class PostService {
     }
 
 
-    async uploadPostImages(request: Request, response: Response, postId: number, imageLink: string) {
+    async saveImageLink(request: Request, response: Response, postId: number, imageLink: string) {
         const post = await postRepository.findOne({ where: { id: postId } });
         if (!post) throw new Error("Post not found");
 
         try {
-            await imageUpload(request, response, imageLink)
+
             const newPostImage = postImageRepository.create({
                 imageLink,
                 postId: post.id
@@ -159,7 +159,6 @@ export class PostService {
                 totalPosts = await postRepository.count({ where: query });
             }
         
-            console.log(posts);
             
             const totalPages = Math.ceil(totalPosts / postQty);
             
@@ -173,7 +172,7 @@ export class PostService {
         
                 const postImages = await postImageRepository.find({ where: { postId: post.id } });
                 post.images = postImages.map(postImage => ({
-                    imageLink: `http://localhost:3000/user/images/${postImage.imageLink}.jpg`,
+                    imageLink: postImage.imageLink,
                     postId: post.id 
                 }));
                 return post;
