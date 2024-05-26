@@ -18,7 +18,7 @@ export class LoginController {
        
         return response.cookie('token', result.token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', 
+            secure: false,
             maxAge: 8 * 60 * 60 * 1000, 
             sameSite: 'strict' 
         }).status(200).json({ user: result.user });

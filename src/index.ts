@@ -8,9 +8,16 @@ require('dotenv').config();
 import cookieParser from 'cookie-parser';
 
 
+const corsOptions = {
+    origin: 'http://localhost:5173', 
+    credentials: true, 
+};
+
+
+
 AppDataSource.initialize().then(() => {
     const app = express();
-    app.use(cors())
+    app.use(cors(corsOptions));
     app.use(cookieParser());
 
     app.use(express.json());
