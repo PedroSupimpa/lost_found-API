@@ -41,7 +41,6 @@ export interface IGetPostsParams {
 }
 
 
-//const url = "localhost:3000";
 const url= "lost-found-api-d361.onrender.com";
 export class PostService {
 
