@@ -1,15 +1,14 @@
 import { Point } from "geojson";
 
-import { postRepository } from "../repository/postRepository";
-import { userRepository } from "../repository/userRepository";
-import { PostCategory } from "../entities/PostCategory";
-import { postCategoryRepository } from "../repository/postCategory";
-import { postImageRepository } from "../repository/postImageRepository";
-import { imageUpload } from "../utils/imageUpload";
 import { Request, Response } from "express";
 import fs from "fs";
 import { ILike } from "typeorm";
 import { Post } from "../entities/Post";
+import { PostCategory } from "../entities/PostCategory";
+import { postCategoryRepository } from "../repository/postCategory";
+import { postImageRepository } from "../repository/postImageRepository";
+import { postRepository } from "../repository/postRepository";
+import { userRepository } from "../repository/userRepository";
 
 
 
@@ -41,7 +40,6 @@ export interface IGetPostsParams {
 }
 
 
-//const url = "localhost:3000";
 const url= "lost-found-api-d361.onrender.com";
 export class PostService {
 
@@ -71,12 +69,12 @@ export class PostService {
     }
 
 
-    async uploadPostImages(request: Request, response: Response, postId: number, imageLink: string) {
+    async saveImageLink(request: Request, response: Response, postId: number, imageLink: string) {
         const post = await postRepository.findOne({ where: { id: postId } });
         if (!post) throw new Error("Post not found");
 
         try {
-            await imageUpload(request, response, imageLink)
+
             const newPostImage = postImageRepository.create({
                 imageLink,
                 postId: post.id
@@ -122,44 +120,44 @@ export class PostService {
             let posts : Post[];
             let totalPosts: number;
 
-
             if (params.latitude && params.longitude && params.locationRange) {
-                const locationQuery = `circle(point(:longitude, :latitude), :radius) @> location`;
-        
+ 
+                const radiusInDegrees = parseFloat(params.locationRange) / 111000;
+                const locationQuery = `circle(point( :latitude,:longitude), :radius) @> location`;
+    
                 posts = await postRepository.createQueryBuilder("post")
                     .leftJoinAndSelect("post.category", "category")
                     .where(query)
                     .andWhere(locationQuery, {
                         longitude: params.longitude,
                         latitude: params.latitude,
-                        radius: params.locationRange
+                        radius: radiusInDegrees
                     })
                     .skip((page - 1) * postQty)
                     .take(postQty)
                     .orderBy(`post.${sortPost}`, 'DESC')
                     .getMany();
-        
+    
                 totalPosts = await postRepository.createQueryBuilder("post")
                     .where(query)
                     .andWhere(locationQuery, {
                         longitude: params.longitude,
                         latitude: params.latitude,
-                        radius: params.locationRange
+                        radius: radiusInDegrees
                     })
                     .getCount();
             } else {
                 posts = await postRepository.find({
-                    relations: ["category"], 
+                    relations: ["category"],
                     where: query,
                     skip: (page - 1) * postQty,
                     take: postQty,
                     order: { [sortPost]: 'DESC' }
                 });
-        
+    
                 totalPosts = await postRepository.count({ where: query });
             }
         
-            console.log(posts);
             
             const totalPages = Math.ceil(totalPosts / postQty);
             
@@ -173,7 +171,7 @@ export class PostService {
         
                 const postImages = await postImageRepository.find({ where: { postId: post.id } });
                 post.images = postImages.map(postImage => ({
-                    imageLink: `http://localhost:3000/user/images/${postImage.imageLink}.jpg`,
+                    imageLink: postImage.imageLink,
                     postId: post.id 
                 }));
                 return post;
@@ -184,8 +182,6 @@ export class PostService {
             throw error;
         }
     }
-
-
 
     async deletePost(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });

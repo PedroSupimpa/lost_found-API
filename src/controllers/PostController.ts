@@ -24,12 +24,21 @@ export class PostController {
     }
 
 
-    async uploadPostImages(request: Request, response: Response) {
-        const { postId } = request.params;
-        const imageLink = uuidv4();
+    async imageLink(request: Request, response: Response) {
+        const  postId  = request.query.id as string || "";
+        const imageLink = request.query.link as string || "";
+
+        if (!postId) {
+            return response.status(400).json({ message: "Post id is required" });
+        }
+
+        if (!imageLink) {
+            return response.status(400).json({ message: "Image link is required" });
+        }
+
         const postService = new PostService();
 
-        await postService.uploadPostImages(request, response, parseInt(postId), imageLink)
+        await postService.saveImageLink(request, response, parseInt(postId), imageLink)
 
         response.json({ message: "Images uploaded successfully" })
 
@@ -78,7 +87,6 @@ export class PostController {
 
     async createPostCategory(request: Request, response: Response) {
         const  categoryName  = request.body.category;
-        console.log(categoryName);
         
         const postService = new PostService();
         const category = await postService.createCategory(categoryName);
