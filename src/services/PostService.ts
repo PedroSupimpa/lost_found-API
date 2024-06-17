@@ -157,13 +157,31 @@ export class PostService {
     
                 totalPosts = await postRepository.count({ where: query });
             }
-    
-            return { posts, totalPosts };
+        
+            
+            const totalPages = Math.ceil(totalPosts / postQty);
+            
+            await Promise.all(posts.map(async post => {
+                if (post.category) { 
+                    const category = await postCategoryRepository.findOne({ where: { id: post.category.id } });
+                    if (category) {
+                        post.category = category;
+                    }
+                }
+        
+                const postImages = await postImageRepository.find({ where: { postId: post.id } });
+                post.images = postImages.map(postImage => ({
+                    imageLink: postImage.imageLink,
+                    postId: post.id 
+                }));
+                return post;
+            }));
+        
+            return { posts, totalPages };
         } catch (error) {
-            throw new Error("Error fetching posts");
+            throw error;
         }
     }
-
 
     async deletePost(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });
