@@ -1,15 +1,14 @@
 import { Point } from "geojson";
 
-import { postRepository } from "../repository/postRepository";
-import { userRepository } from "../repository/userRepository";
-import { PostCategory } from "../entities/PostCategory";
-import { postCategoryRepository } from "../repository/postCategory";
-import { postImageRepository } from "../repository/postImageRepository";
-import { imageUpload } from "../utils/imageUpload";
 import { Request, Response } from "express";
 import fs from "fs";
 import { ILike } from "typeorm";
 import { Post } from "../entities/Post";
+import { PostCategory } from "../entities/PostCategory";
+import { postCategoryRepository } from "../repository/postCategory";
+import { postImageRepository } from "../repository/postImageRepository";
+import { postRepository } from "../repository/postRepository";
+import { userRepository } from "../repository/userRepository";
 
 
 
@@ -121,68 +120,49 @@ export class PostService {
             let posts : Post[];
             let totalPosts: number;
 
-
             if (params.latitude && params.longitude && params.locationRange) {
-                const locationQuery = `circle(point(:longitude, :latitude), :radius) @> location`;
-        
+ 
+                const radiusInDegrees = parseFloat(params.locationRange) / 111000;
+                const locationQuery = `circle(point( :latitude,:longitude), :radius) @> location`;
+    
                 posts = await postRepository.createQueryBuilder("post")
                     .leftJoinAndSelect("post.category", "category")
                     .where(query)
                     .andWhere(locationQuery, {
                         longitude: params.longitude,
                         latitude: params.latitude,
-                        radius: params.locationRange
+                        radius: radiusInDegrees
                     })
                     .skip((page - 1) * postQty)
                     .take(postQty)
                     .orderBy(`post.${sortPost}`, 'DESC')
                     .getMany();
-        
+    
                 totalPosts = await postRepository.createQueryBuilder("post")
                     .where(query)
                     .andWhere(locationQuery, {
                         longitude: params.longitude,
                         latitude: params.latitude,
-                        radius: params.locationRange
+                        radius: radiusInDegrees
                     })
                     .getCount();
             } else {
                 posts = await postRepository.find({
-                    relations: ["category"], 
+                    relations: ["category"],
                     where: query,
                     skip: (page - 1) * postQty,
                     take: postQty,
                     order: { [sortPost]: 'DESC' }
                 });
-        
+    
                 totalPosts = await postRepository.count({ where: query });
             }
-        
-            
-            const totalPages = Math.ceil(totalPosts / postQty);
-            
-            await Promise.all(posts.map(async post => {
-                if (post.category) { 
-                    const category = await postCategoryRepository.findOne({ where: { id: post.category.id } });
-                    if (category) {
-                        post.category = category;
-                    }
-                }
-        
-                const postImages = await postImageRepository.find({ where: { postId: post.id } });
-                post.images = postImages.map(postImage => ({
-                    imageLink: postImage.imageLink,
-                    postId: post.id 
-                }));
-                return post;
-            }));
-        
-            return { posts, totalPages };
+    
+            return { posts, totalPosts };
         } catch (error) {
-            throw error;
+            throw new Error("Error fetching posts");
         }
     }
-
 
 
     async deletePost(postId: number) {
