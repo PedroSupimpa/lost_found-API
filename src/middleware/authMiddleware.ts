@@ -3,7 +3,7 @@ import { userRepository } from "../repository/userRepository";
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = async (request: Request, response: Response, next: NextFunction) => {
-    const token = request.cookies['token']; 
+    const token = request.cookies['token'];
 
     if (!token) {
         return response.status(401).json({ error: "Not authorized. No token provided." });

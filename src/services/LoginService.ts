@@ -1,6 +1,6 @@
-import { userRepository } from "../repository/userRepository";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
+import { userRepository } from "../repository/userRepository";
 
 
 interface ILoginRequest {
@@ -11,7 +11,6 @@ interface ILoginRequest {
 export class LoginService {
 
     async login({ email, password }: ILoginRequest) {
-
         const user = await userRepository.findOne({ where: { email } });
 
         if (!user) {
