@@ -1,15 +1,15 @@
+import cookieParser from 'cookie-parser';
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 import AppDataSource from './data-source';
 import routes from './routes';
-import path from 'path';
-import fs from 'fs';
 const cors = require('cors')
 require('dotenv').config();
-import cookieParser from 'cookie-parser';
 
 
 const corsOptions = {
-    origin: 'http://your-production-domain.com',
+    origin: 'https://lostandfound-ophx.onrender.com/',
     credentials: true, 
 };
 
