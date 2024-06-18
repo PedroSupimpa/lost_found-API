@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { UserController } from './controllers/UserController'
 import { LoginController } from './controllers/LoginController'
-import { authMiddleware } from './middleware/authMiddleware'
 import { PostController } from './controllers/PostController'
+import { UserController } from './controllers/UserController'
+import { authMiddleware } from './middleware/authMiddleware'
 
 const routes = Router()
 
@@ -12,10 +12,11 @@ routes.get('/user/authentication', authMiddleware, new LoginController().getAuth
 routes.put('/user/:id', authMiddleware,new UserController().update)
 routes.put('/user/address/:userId',authMiddleware, new UserController().updateAddress)
 routes.put('/user/password/:id', authMiddleware, new UserController().updatePassword)
-routes.post('/user/createPost/:userId',authMiddleware, new PostController().create)
+routes.post('/user/createPost',authMiddleware, new PostController().create)
 routes.post('/user/imageLink',authMiddleware, new PostController().imageLink)
 routes.get('/user/postImages/:postId', new PostController().postImages)
 routes.get('/user/getPosts', new PostController().getPosts)
+routes.get('/user/Posts', authMiddleware, new PostController().getPostByUser)
 routes.delete('/user/deletePost/:postId',authMiddleware, new PostController().deletePost)
 routes.post('/new-category', new PostController().createPostCategory)
 routes.get('/get-categories', new PostController().getPostCategories)

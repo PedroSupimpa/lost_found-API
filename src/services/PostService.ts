@@ -183,6 +183,32 @@ export class PostService {
         }
     }
 
+     async getPostByUser(userId: number) {
+        try {
+            const user = await userRepository.findOne({ where: { id: userId } });
+            if (!user) throw new Error("User not found");
+
+            const posts = await postRepository.find({
+                where: { createdByUser: { id: userId } }, // Certifique-se de que a propriedade está correta
+                relations: ["category"]
+            });
+
+            await Promise.all(posts.map(async post => {
+                const postImages = await postImageRepository.find({ where: { postId: post.id } });
+                post.images = postImages.map(postImage => ({
+                    imageLink: postImage.imageLink,
+                    postId: post.id 
+                }));
+                return post;
+            }));
+
+            return posts;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+
     async deletePost(postId: number) {
         const post = await postRepository.findOne({ where: { id: postId } });
         const postImages = await postImageRepository.find({ where: { postId: postId } });

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { v4 as uuidv4 } from 'uuid';
 import { IGetPostsParams, PostService } from "../services/PostService";
 
 
@@ -9,14 +8,19 @@ import { IGetPostsParams, PostService } from "../services/PostService";
 export class PostController {
 
     async create(request: Request, response: Response) {
-        const { userId } = request.params;
+        if (!request.user || !request.user.id) {
+            return response.status(400).json({ error: "User not authenticated" });
+        }
+    
+        const userId = request.user.id;
+    
         const { title, description, category, location } = request.body;
 
         const postService = new PostService();
 
         const post = await postService.create({
             title, description, category, location, createdDate: new Date(),
-            createdByUser: parseInt(userId)
+            createdByUser: userId
         });
 
         return response.json(post);
@@ -74,6 +78,19 @@ export class PostController {
 
         return response.json(posts);
     }
+
+    async getPostByUser(request: Request, response: Response)  {
+        if (!request.user || !request.user.id) {
+            return response.status(400).json({ error: "User not authenticated" });
+        }
+    
+        const userId = request.user.id;
+    
+        const postService = new PostService();
+        const posts = await postService.getPostByUser(userId);
+    
+        return response.json(posts);
+    };
 
     async deletePost(request: Request, response: Response) {
         const { postId } = request.params;
