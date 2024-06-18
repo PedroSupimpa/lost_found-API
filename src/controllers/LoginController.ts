@@ -19,7 +19,7 @@ export class LoginController {
             httpOnly: true,
             secure: false,
             maxAge: 8 * 60 * 60 * 1000, 
-            sameSite: 'strict'
+            sameSite: 'none'
         }).status(200).json({ user: result.user });
     }
 
