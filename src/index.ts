@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 
 
 const corsOptions = {
-    origin: 'http://localhost:5173', 
+    origin: 'http://your-production-domain.com',
     credentials: true, 
 };
 
