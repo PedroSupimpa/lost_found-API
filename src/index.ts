@@ -9,7 +9,7 @@ require('dotenv').config();
 
 
 const corsOptions = {
-    origin: 'https://lostandfound-ophx.onrender.com/',
+    origin: 'https://lostandfound-ophx.onrender.com',
     credentials: true, 
 };
 
